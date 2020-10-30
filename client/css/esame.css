@@ -1,0 +1,48 @@
+.below-nav{
+    margin-top: 60px;
+}
+
+.vheight-100{
+    min-height: 100vh;
+}
+
+.imgSignin{
+    max-width: 100%;
+    height: 100%;
+}
+
+.form{
+    margin-top: 10%;
+    margin-left: auto;
+}
+
+.immEpisodio {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 150px;
+}
+
+img:hover {
+    box-shadow: 0 0 2px 1px #343a40;
+}
+
+.center {
+    justify-content: center;
+    position: relative;
+    margin: auto;
+    margin-top: auto;
+    width: 50%;
+    border: 3px solid #343a40;
+    padding: 10px;
+}
+
+.centerLog {
+    justify-content: center;
+    position: relative;
+    margin: auto;
+    margin-top: 20%;
+    width: 50%;
+    border: 3px solid #343a40;
+    padding: 10px;
+}
