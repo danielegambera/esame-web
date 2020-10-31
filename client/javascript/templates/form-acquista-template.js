@@ -1,10 +1,13 @@
 'use strict';
 
-function createLoginForm() {
+function createAcquistaForm(episodio) {
     return `<form method="POST" action="" id="buy-form" class="col-6 mx-auto below-nav">
     <div id="error-messages"></div>
 
     <p>Acquista</p>
+
+    <h1 class="display-4">${episodio.titolo}</h1>
+    <p>Costo: ${episodio.costo}</p>
     
     <div class="form-group">
         <label class="control-label">Numero carta di credito</label>
@@ -23,4 +26,4 @@ function createLoginForm() {
   </form>`;
 }
 
-export default createLoginForm;
+export default createAcquistaForm;

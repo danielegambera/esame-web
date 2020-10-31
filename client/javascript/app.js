@@ -4,7 +4,6 @@ import CommentoManager from './commento-manager.js';
 import createPodcastAddForm from './templates/form-podcast-template.js';
 import createEpisodioAddForm from './templates/form-episodio-template.js';
 import createCommentoAddForm from './templates/form-commento-template.js';
-//import createPodcastsPage from './templates/podcast-list-template.js';
 import Podcast from './podcast.js';
 import Episodio from './episodio.js';
 import Commento from './commento.js';
@@ -46,8 +45,6 @@ class App {
         page('/preferiti', this.showPreferiti);
         //mostra tutti i podcast acquistati
         page('/acquistati', this.showAcquistati);
-        //mostra tutti i podcast personali
-        page('/personali', this.showPersonali);
 
         //mostra solo la pagina del podcast
         page('/podcasts/:id', (ctx) => {
@@ -367,28 +364,7 @@ class App {
         }
     }
 
-    /**
-     * Create the HTML table for showing the podcast
-     */
-    showPersonali = async () => {
-        try {
-            const podcasts = getAllPersonali();
-
-            this.renderNavBar('personali');
-
-            this.appContainer.innerHTML = createPodcastTable();
-            const podcastTable = document.querySelector('#podcast-list');
-
-            for (let podcast of podcasts) {
-                const podcastRow = createPodcastRow(podcast);
-                podcastTable.insertAdjacentHTML('beforeend', podcastRow);
-            }
-        } catch (error) {
-            page.redirect('/login');
-        }
-    }
-
-    showPodcastPage = async (id, userId) => {
+    showPodcastPage = async (podcast, user) => {
         try {
             //come prendo il podcast dato id????
             const podcast = getPodcast(id, userId);
@@ -418,6 +394,7 @@ class App {
 
               // callback to seguire a podcast
               segui.addEventListener('click', () => {
+                  //aggiungere un controllo per i seguiti
                   this.podcastManager.addSegui(podcast.id, userId)
                       .catch((error) => {
                           // add an alert message in DOM

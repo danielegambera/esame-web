@@ -28,7 +28,7 @@ exports.getUserById = function(id) {
           else if (row === undefined)
               resolve({error: 'User not found.'});
           else {
-              const user = {id: row.id, username: row.email}
+              const user = {id: row.id, username: row.email, nome: row.nome, creatore: row.creatore}
               resolve(user);
           }
       });
@@ -44,7 +44,7 @@ exports.getUser = function(email, password) {
           else if (row === undefined)
               resolve({error: 'User not found.'});
           else {
-            const user = {id: row.id, username: row.email};
+            const user = {id: row.id, username: row.email, nome: row.nome, creatore: row.creatore};
             let check = false;
             
             if(bcrypt.compareSync(password, row.password))

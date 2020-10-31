@@ -7,7 +7,6 @@ class PodcastManager {
         this.seguiti = [];
         this.preferiti = [];
         this.acquistati = [];
-        this.personali = [];
     }
 
     //prendi tutti i podcasts
@@ -55,18 +54,6 @@ class PodcastManager {
             return this.acquistati;
         } else {
             throw acquistatiJson;
-        }
-    }
-
-    //prendi i personali
-    async getAllPersonali() {
-        let response = await fetch('/api/personali');
-        const personaliJson = await response.json();
-        if (response.ok) {
-            this.personali = personaliJson.map((ex) => Podcast.form(ex));
-            return this.personali;
-        } else {
-            throw personaliJson;
         }
     }
 

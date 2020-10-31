@@ -1,6 +1,10 @@
 
 function createPodcastTable() {
-    return `<table class="table">
+    return `
+    <p>Podcast</p>
+    <!-- Add a new podcast... -->
+    <a type="button" href="/addPodcast" id="add-button" class="btn btn-lg btn-success fixed-right-bottom">&#43;</a>
+    <table class="table">
         <thead class="thead-light">
             <tr>
                 <th>Titolo</th>

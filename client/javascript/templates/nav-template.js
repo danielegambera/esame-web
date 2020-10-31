@@ -13,9 +13,6 @@ function createNavLinks(active) {
   <li class="nav-item ${active==='acquistati' ? 'active' : ''}">
     <a class="nav-link" href="/acquistati">Acquistati ${active==='acquistati' ? '<span class="sr-only">(current)</span>' : ''}</a>
   </li>
-  <li class="nav-item ${active==='personali' ? 'active' : ''}">
-    <a class="nav-link" href="/personali">Personali ${active==='personali' ? '<span class="sr-only">(current)</span>' : ''}</a>
-  </li>
   `;
 }
 
