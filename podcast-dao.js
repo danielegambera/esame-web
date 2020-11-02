@@ -23,16 +23,12 @@ const createPodcast = function (dbPodcast) {
 exports.getAllPodcast = function() {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM podcasts';
-        db.get(sql, (err, row) => {
+        db.all(sql, (err, rows) => {
             if (err)
                 reject(err);
-            else if (row === undefined)
-                resolve({
-                    error: 'Podcast not found.'
-                });
             else {
-                const podcast = createPodcast(row);
-                resolve(podcast);
+                let podcasts = rows.map((row) => createPodcast(row));
+                resolve(podcasts);
             }
         });
     });

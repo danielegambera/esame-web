@@ -79,7 +79,7 @@ app.use(passport.session());
 // === REST API endpoints ===/
 
 // GET /podcasts
-app.get('/api/podcasts', isLoggedIn, (res) => {
+app.get('/api/podcasts', (res) => {
     daoPodcast.getAllPodcast()
         .then((podcasts) => res.json(podcasts) )
         .catch((err) => {
@@ -89,8 +89,34 @@ app.get('/api/podcasts', isLoggedIn, (res) => {
        });
 });
 
+// GET /episodi
+app.get('/api/episodi', (res) => {
+    daoEpisodio.getAllEpisodi()
+        .then((episodi) => res.json(episodi))
+        .catch((err) => {
+            res.status(500).json({
+                errors: [{
+                    'msg': err
+                }],
+            });
+        });
+});
+
+// GET /commenti
+app.get('/api/commenti', (res) => {
+    daoCommento.getAllCommenti()
+        .then((commenti) => res.json(commenti))
+        .catch((err) => {
+            res.status(500).json({
+                errors: [{
+                    'msg': err
+                }],
+            });
+        });
+});
+
 // GET /preferiti
-app.get('/api/preferiti', isLoggedIn, (res) => {
+app.get('/api/preferiti', isLoggedIn, (req, res) => {
     daoEpisodio.getPreferiti(req.user.id)
         .then((episodi) => res.json(episodi))
         .catch((err) => {
@@ -103,7 +129,7 @@ app.get('/api/preferiti', isLoggedIn, (res) => {
 });
 
 // GET /acquistati
-app.get('/api/acquistati', isLoggedIn, (res) => {
+app.get('/api/acquistati', isLoggedIn, (req, res) => {
     daoEpisodio.getAcquistati(req.user.id)
         .then((episodi) => res.json(episodi))
         .catch((err) => {
@@ -116,7 +142,7 @@ app.get('/api/acquistati', isLoggedIn, (res) => {
 });
 
 // GET /seguiti
-app.get('/api/seguiti', isLoggedIn, (res) => {
+app.get('/api/seguiti', isLoggedIn, (req, res) => {
     daoPodcast.getSeguiti(req.user.id)
         .then((podcasts) => res.json(podcasts))
         .catch((err) => {
@@ -129,7 +155,7 @@ app.get('/api/seguiti', isLoggedIn, (res) => {
 });
 
 // GET /podcasts/<podcastId>
-app.get('/api/podcasts/:podcastId', isLoggedIn, (req, res) => {
+app.get('/api/podcasts/:podcastId', (req, res) => {
     daoPodcast.getPodcast(req.params.podcastId, req.user.id)
         .then((podcast) => {
             if(podcast.error){

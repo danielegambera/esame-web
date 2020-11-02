@@ -11,6 +11,20 @@ const createCommento = function (dbCommento) {
     return new Commento(dbCommento.id, dbCommento.titolo, dbCommento.testo, moment.utc(dbCommento.data), dbCommento['user_id']);
 }
 
+exports.getAllCommenti = function () {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM commenti';
+        db.all(sql, (err, rows) => {
+            if (err)
+                reject(err);
+            else {
+                let commenti = rows.map((row) => createCommento(row));
+                resolve(commenti);
+            }
+        });
+    });
+}
+
 exports.getCommento = function (id, userId) {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM commenti WHERE id = ? AND user_id = ?';

@@ -44,30 +44,6 @@ class PodcastManager {
         }
     }
 
-    //prendi i preferiti
-    async getAllPreferiti() {
-        let response = await fetch('/api/preferiti');
-        const preferitiJson = await response.json();
-        if (response.ok) {
-            this.preferiti = preferitiJson.map((ex) => Podcast.form(ex));
-            return this.preferiti;
-        } else {
-            throw preferitiJson;
-        }
-    }
-
-    //prendi i acquistati
-    async getAllAcquistati() {
-        let response = await fetch('/api/acquistati');
-        const acquistatiJson = await response.json();
-        if (response.ok) {
-            this.acquistati = acquistatiJson.map((ex) => Podcast.form(ex));
-            return this.acquistati;
-        } else {
-            throw acquistatiJson;
-        }
-    }
-
     //aggiungi podcast
     async addPodcast(podcast) {
         let response = await fetch('/api/podcasts', {
@@ -97,56 +73,6 @@ class PodcastManager {
     //aggiungi podcast
     async addSegui(podcastId, userId) {
         let response = await fetch('/api/seguiti', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(podcastId, userId),
-        });
-        if (response.ok) {
-            return;
-        } else {
-            try {
-                const errDetail = await response.json();
-                throw errDetail.errors;
-            } catch (err) {
-                if (Array.isArray(err)) {
-                    let errors = '';
-                    err.forEach((e, i) => errors += `${i}. ${e.msg} for '${e.param}', `);
-                    throw `Error: ${errors}`;
-                } else
-                    throw 'Error: cannot parse server response';
-            }
-        }
-    }
-
-    async addPreferiti(podcastId, userId) {
-        let response = await fetch('/api/preferiti', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(podcastId, userId),
-        });
-        if (response.ok) {
-            return;
-        } else {
-            try {
-                const errDetail = await response.json();
-                throw errDetail.errors;
-            } catch (err) {
-                if (Array.isArray(err)) {
-                    let errors = '';
-                    err.forEach((e, i) => errors += `${i}. ${e.msg} for '${e.param}', `);
-                    throw `Error: ${errors}`;
-                } else
-                    throw 'Error: cannot parse server response';
-            }
-        }
-    }
-
-    async addAcquistati(podcastId, userId) {
-        let response = await fetch('/api/acquistati', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -220,27 +146,6 @@ class PodcastManager {
 
     async deleteSeguiti(podcastId, userId) {
         let response = await fetch(`/api/seguiti/${podcastId}/${userId}`, {
-            method: 'DELETE',
-        });
-        if (response.ok) {
-            return;
-        } else {
-            try {
-                const errDetail = await response.json();
-                throw errDetail.errors;
-            } catch (err) {
-                if (Array.isArray(err)) {
-                    let errors = '';
-                    err.forEach((e, i) => errors += `${i}. ${e.msg} for '${e.param}', `);
-                    throw `Error: ${errors}`;
-                } else
-                    throw 'Error: cannot parse server response';
-            }
-        }
-    }
-
-    async deletePreferiti(podcastId) {
-        let response = await fetch(`/api/preferiti/${podcastId}/${userId}`, {
             method: 'DELETE',
         });
         if (response.ok) {

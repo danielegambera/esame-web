@@ -9,11 +9,12 @@ import Episodio from './episodio.js';
 import Commento from './commento.js';
 import Api from './api.js';
 import { createEpisodioRow, createEpisodioTable, createPodcastPage } from './templates/page-podcast-template.js';
-import { createPodcastTable, createPodcastRow} from './templates/page-tabella-template.js';
+import { createPodcastTable, createPodcastRow} from './templates/page-tabella-podcast-template.js';
 import createLoginForm from './templates/login-template.js';
 import createSignupForm from './templates/signup-template.js';
 import createAlert from './templates/alert-template.js';
 import page from '//unpkg.com/page/page.mjs';
+import createAcquistaForm from './templates/form-acquista-template.js';
 
 
 
@@ -42,20 +43,20 @@ class App {
         });
 
         //mostra tutti i podcast
-        page('/podcasts', (ctx) => {
-            this.showAllPodcasts(ctx.path);
+        page('/podcasts', () => {
+            this.showPodcasts();
         });
         //mostra tutti i podcast seguiti
-        page('/seguiti', (ctx) => {
-            this.showSeguiti(ctx.path);
+        page('/seguiti', () => {
+            this.showSeguiti();
         });
         //mostra tutti i podcast preferiti
-        page('/preferiti', (ctx) => {
-            this.showPreferiti(ctx.path);
+        page('/preferiti', () => {
+            this.showPreferiti();
         });
         //mostra tutti i podcast acquistati
-        page('/acquistati', (ctx) => {
-            this.showAcquistati(ctx.path);
+        page('/acquistati', () => {
+            this.showAcquistati();
         });
 
         //mostra solo la pagina del podcast
@@ -118,6 +119,23 @@ class App {
 
     }
 
+       onAcquistaFormSubmitted = (event) => {
+           event.preventDefault();
+           const addForm = document.getElementById('acquista-form');
+
+           const numeroCarta = addForm.elements['form-numero'].value;
+           const ccv = addForm.elements['form-ccv'].value;
+
+           if (isNaN(numeroCarta) || isNaN(ccv) || check('numeroCarta').isLength({min: 14, max: 15})|| check('ccv').isLength({min: 3, max: 4})) {
+                    document.getElementById('error-messages').innerHTML = createAlert('danger', "Numeri non nel formato corretto");
+           } else {
+               //the id is empty -> add
+               this.episodioManager.addAcquistati(podcast).then(() => {
+                   page('/');
+               });
+           }
+       }
+
     /**
      * Handling the form submission: edit and add podcast
      * @param {*} event the submission event
@@ -127,6 +145,9 @@ class App {
         const addForm = document.getElementById('podcast-form');
 
         const titolo = addForm.elements['form-titolo'].value;
+        const categoria = addForm.elements['form-categoria'].value;
+        const descrizione = addForm.elements['form-descrizione'].value;
+        const immagine = addForm.elements['fileImg'].value;
         
         if(addForm.elements['form-id'].value && addForm.elements['form-id'].value !== ""){
             //sono nel campo update
@@ -165,14 +186,14 @@ class App {
         const titolo = addForm.elements['form-titolo'].value;
         const descrizione = addForm.elements['form-descrizione'].value;
         const prezzo = addForm.elements['form-prezzo'].value;
-        //const audio = addForm.elements['form-audio'].value;
+        const audio = addForm.elements['form-audio'].value;
         const sponsor = addForm.elements['form-sponsor'].value;
 
         if (addForm.elements['form-id'].value && addForm.elements['form-id'].value !== "") {
             //sono nel campo update
             //there is a podcast id -> update
             const id = addForm.elements['form-id'].value;
-            const episodio = new Episodio(id, titolo, descrizione, undefined, sponsor, prezzo);
+            const episodio = new Episodio(id, titolo, descrizione, audio, sponsor, prezzo);
             this.episodioManager.updateEpisodo(episodio)
                 .then(() => {
                     //reset the form and go back to the home
@@ -185,7 +206,7 @@ class App {
                 });
         } else {
             //the id is empty -> add
-            const episodio = new Episodio(undefined, titolo, descrizione, undefined, sponsor, prezzo);
+            const episodio = new Episodio(undefined, titolo, descrizione, audio, sponsor, prezzo);
             this.episodioManager.addEpisodo(episodio).then(() => {
                 page('/');
             });
@@ -254,6 +275,17 @@ class App {
         document.getElementById('podcast-form').addEventListener('submit', this.onPodcastFormSubmitted);
     }
 
+     showAcquistaForm = async (id) => {
+         // add the form
+         this.appContainer.innerHTML = createAcquistaForm();
+
+             const addForm = document.getElementById('acquista-form');
+             addForm.elements['form-numero'].value = podcast.id;
+             addForm.elements['form-ccv'].value = podcast.titolo;
+         // set up form callback
+         document.getElementById('acquista-form').addEventListener('submit', this.onAcquistaFormSubmitted);
+     }
+
     showAddEditEpisodioForm = async (id) => {
         // add the form
         this.appContainer.innerHTML = createEpisodioAddForm();
@@ -295,7 +327,7 @@ class App {
        /**
         * Show all podcast
         * @param {*} path the current path (URL)
-        */
+        *
        showAllPodcasts = async (path) => {
            try {
                await this.init();
@@ -303,14 +335,14 @@ class App {
            } catch (err) {
                page('/login');
            }
-       }
+       }*/
 
     /**
      * Create the HTML table for showing the podcast
      */
     showPodcasts = async () => {
         try {
-            const podcasts = getAllPodcasts();
+            const podcasts = await this.podcastManager.getAllPodcasts();
 
             const user = localStorage.getItem('user');
 
@@ -323,7 +355,6 @@ class App {
                 }, 3000);
                 localStorage.clear();
             }
-
 
             //this.renderNavBar('tutti');
 
@@ -344,7 +375,8 @@ class App {
      */
     showSeguiti = async () => {
         try {
-            const podcasts = getAllSeguiti();
+            const podcasts = await this.podcastManager.getAllSeguiti();
+            //const user = localStorage.getItem('user');
 
             //this.renderNavBar('seguiti');
 
@@ -365,7 +397,7 @@ class App {
      */
     showPreferiti = async () => {
         try {
-            const podcasts = getAllPreferiti();
+            const podcasts = await this.episodioManager.getAllPreferiti();
 
             //this.renderNavBar('preferiti');
 
@@ -386,7 +418,7 @@ class App {
      */
     showAcquistati = async () => {
         try {
-            const podcasts = getAllAcquistati();
+            const podcasts = await this.episodioManager.getAllAcquistati();
 
             //this.renderNavBar('acquistati');
 

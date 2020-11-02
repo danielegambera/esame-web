@@ -11,6 +11,20 @@ const createEpisodio = function (dbEpisodio) {
     return new Episodio(dbEpisodio.id, dbEpisodio.titolo, dbEpisodio.descrizione, dbEpisodio.audio, dbEpisodio.sponsor, dbEpisodio.prezzo, moment.utc(dbEpisodio.data), dbEpisodio['user_id']);
 }
 
+exports.getAllEpisodi = function () {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM episodi';
+        db.all(sql, (err, rows) => {
+            if (err)
+                reject(err);
+            else {
+                let episodi = rows.map((row) => createEpisodio(row));
+                resolve(episodi);
+            }
+        });
+    });
+}
+
 exports.getEpisodio = function (id, userId) {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM episodi WHERE id = ? AND user_id = ?';
