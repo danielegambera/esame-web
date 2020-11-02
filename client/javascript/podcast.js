@@ -7,7 +7,6 @@ class Podcast{
         this.id = id;
         this.titolo = titolo;
         this.descrizione = descrizione;
-        data = moment().format("DD/MM/YYYY");
         this.categoria = categoria;
         this.immagine = immagine;
     }

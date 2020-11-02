@@ -79,7 +79,7 @@ app.use(passport.session());
 // === REST API endpoints ===/
 
 // GET /podcasts
-app.get('/api/podcasts', (res) => {
+app.get('/api/podcasts', isLoggedIn, (res) => {
     daoPodcast.getAllPodcast()
         .then((podcasts) => res.json(podcasts) )
         .catch((err) => {
@@ -89,8 +89,47 @@ app.get('/api/podcasts', (res) => {
        });
 });
 
+// GET /preferiti
+app.get('/api/preferiti', isLoggedIn, (res) => {
+    daoEpisodio.getPreferiti(req.user.id)
+        .then((episodi) => res.json(episodi))
+        .catch((err) => {
+            res.status(500).json({
+                errors: [{
+                    'msg': err
+                }],
+            });
+        });
+});
+
+// GET /acquistati
+app.get('/api/acquistati', isLoggedIn, (res) => {
+    daoEpisodio.getAcquistati(req.user.id)
+        .then((episodi) => res.json(episodi))
+        .catch((err) => {
+            res.status(500).json({
+                errors: [{
+                    'msg': err
+                }],
+            });
+        });
+});
+
+// GET /seguiti
+app.get('/api/seguiti', isLoggedIn, (res) => {
+    daoPodcast.getSeguiti(req.user.id)
+        .then((podcasts) => res.json(podcasts))
+        .catch((err) => {
+            res.status(500).json({
+                errors: [{
+                    'msg': err
+                }],
+            });
+        });
+});
+
 // GET /podcasts/<podcastId>
-app.get('/api/podcasts/:podcastId', (req, res) => {
+app.get('/api/podcasts/:podcastId', isLoggedIn, (req, res) => {
     daoPodcast.getPodcast(req.params.podcastId, req.user.id)
         .then((podcast) => {
             if(podcast.error){
@@ -131,6 +170,7 @@ app.post('/api/episodi', isLoggedIn, [
     check('titolo').notEmpty(),
     check('descrizione').notEmpty(),
     check('prezo').notEmpty(),
+    check('prezzo').isInt({min:0}),
 ], (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -202,6 +242,7 @@ app.put('/api/episodi/:episodioId', isLoggedIn, [
     check('titolo').notEmpty(),
     check('descrizione').notEmpty(),
     check('prezo').notEmpty(),
+    check('prezzo').isInt({min:0}),
 ], (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -306,13 +347,14 @@ app.delete('/api/commenti/:commentoId', isLoggedIn, (req, res) => {
 
 // POST /users
 // Sign up
-app.post('/api/users', [check("nome").notEmpty, check("email").notEmpty, check("password").notEmpty], (req, res) => {
+app.post('/api/users', /*[check("nome").notEmpty, check("email").notEmpty, check("password").notEmpty],*/ (req, res) => {
     // create a user object from the signup form
     // additional fields may be useful (name, role, etc.)
     const user = {
         nome: req.body.nome,
         email: req.body.email,
         password: req.body.password,
+        creatore: req.body.creatore,
     };
 
     daoUser.createUser(user)

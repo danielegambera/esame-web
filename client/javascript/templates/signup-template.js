@@ -23,8 +23,8 @@ function createSignUpForm() {
 
     <div class="form-group">
           <div>
-            <label for="form-creatore" class="control-label">Creatore</label>
-            <input type="checkbox" name="form-creatore" id="form-creatore"/>          
+            <label for="creatore" class="control-label">Creatore</label>
+            <input type="checkbox" name="creatore" id="creatore"/>          
           </div>
     </div>
 

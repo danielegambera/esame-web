@@ -8,20 +8,24 @@ import Podcast from './podcast.js';
 import Episodio from './episodio.js';
 import Commento from './commento.js';
 import Api from './api.js';
+import { createEpisodioRow, createEpisodioTable, createPodcastPage } from './templates/page-podcast-template.js';
+import { createPodcastTable, createPodcastRow} from './templates/page-tabella-template.js';
 import createLoginForm from './templates/login-template.js';
 import createSignupForm from './templates/signup-template.js';
 import createAlert from './templates/alert-template.js';
-import {createNavLinks} from './templates/nav-template.js';
 import page from '//unpkg.com/page/page.mjs';
-import { createEpisodioRow, createEpisodioTable, createPodcastPage } from './templates/page-podcast-template.js';
-import { getPodcast } from '../../podcast-dao.js';
+
+
 
 class App {
-    constructor(appContainer, userContainer) {
+    constructor(appContainer) {
         // reference to the podcast list container
         this.appContainer = appContainer;
         // reference to the user/login area in the navbar
-        this.userContainer = userContainer;
+        //this.userContainer = userContainer;
+        this.seguitiLink = document.querySelector('#seguiti');
+        this.preferitiLink = document.querySelector('#preferiti');
+        this.acquistatiLink = document.querySelector('#acquistati');
         this.loginLink = document.querySelector('#login-area');
         this.signupLink = document.querySelector('#signup-area');
         this.logoutLink = document.querySelector('#logout');
@@ -38,13 +42,21 @@ class App {
         });
 
         //mostra tutti i podcast
-        page('/podcasts', this.showPodcasts);
+        page('/podcasts', (ctx) => {
+            this.showAllPodcasts(ctx.path);
+        });
         //mostra tutti i podcast seguiti
-        page('/seguiti', this.showSeguiti);
+        page('/seguiti', (ctx) => {
+            this.showSeguiti(ctx.path);
+        });
         //mostra tutti i podcast preferiti
-        page('/preferiti', this.showPreferiti);
+        page('/preferiti', (ctx) => {
+            this.showPreferiti(ctx.path);
+        });
         //mostra tutti i podcast acquistati
-        page('/acquistati', this.showAcquistati);
+        page('/acquistati', (ctx) => {
+            this.showAcquistati(ctx.path);
+        });
 
         //mostra solo la pagina del podcast
         page('/podcasts/:id', (ctx) => {
@@ -280,6 +292,19 @@ class App {
         document.getElementById('commento-form').addEventListener('submit', this.onCommentoFormSubmitted);
     }
 
+       /**
+        * Show all podcast
+        * @param {*} path the current path (URL)
+        */
+       showAllPodcasts = async (path) => {
+           try {
+               await this.init();
+               this.showPodcasts(path);
+           } catch (err) {
+               page('/login');
+           }
+       }
+
     /**
      * Create the HTML table for showing the podcast
      */
@@ -287,7 +312,20 @@ class App {
         try {
             const podcasts = getAllPodcasts();
 
-            this.renderNavBar('tutti');
+            const user = localStorage.getItem('user');
+
+            if (user !== null) {
+                // welcome the user
+                document.getElementById('error-messages').innerHTML = createAlert('success', `Welcome ${user}!`);
+                // automatically remove the flash message after 3 sec
+                setTimeout(() => {
+                    document.getElementById('error-messages').innerHTML = '';
+                }, 3000);
+                localStorage.clear();
+            }
+
+
+            //this.renderNavBar('tutti');
 
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
@@ -308,7 +346,7 @@ class App {
         try {
             const podcasts = getAllSeguiti();
 
-            this.renderNavBar('seguiti');
+            //this.renderNavBar('seguiti');
 
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
@@ -329,7 +367,7 @@ class App {
         try {
             const podcasts = getAllPreferiti();
 
-            this.renderNavBar('preferiti');
+            //this.renderNavBar('preferiti');
 
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
@@ -350,7 +388,7 @@ class App {
         try {
             const podcasts = getAllAcquistati();
 
-            this.renderNavBar('acquistati');
+            //this.renderNavBar('acquistati');
 
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
@@ -364,11 +402,13 @@ class App {
         }
     }
 
-    showPodcastPage = async (podcast, user) => {
+    showPodcastPage = async (id) => {
         try {
             //come prendo il podcast dato id????
-            const podcast = getPodcast(id, userId);
-            const episodi = getAllPersonali();
+            const podcast = getPodcastId(id);
+            const episodi = getAllEpisodi();
+            //const seguiti = getAllSeguiti();
+            const user = localStorage.getItem('user');
 
             this.appContainer.innerHTML = createPodcastPage(podcast);
 
@@ -395,7 +435,7 @@ class App {
               // callback to seguire a podcast
               segui.addEventListener('click', () => {
                   //aggiungere un controllo per i seguiti
-                  this.podcastManager.addSegui(podcast.id, userId)
+                  this.podcastManager.addSegui(podcast.id, user.id)
                       .catch((error) => {
                           // add an alert message in DOM
                           document.getElementById('error-messages').innerHTML = createAlert('danger', error);
@@ -407,13 +447,18 @@ class App {
         }
     }
 
-    showEpisodioPage = async () => {
+    showEpisodioPage = async (id) => {
         try {
             //come prendo il podcast dato id????
-            const commenti = getAllPersonali();
-            const episodi = getAllPersonali();
+            const commenti = getAllCommenti();
+            const episodio = getEpisodioId(id);
+            const acquistati = getAllAcquistati();
+            const user = localStorage.getItem('user');
 
             this.appContainer.innerHTML = createEpisodioPage(episodio);
+
+            var elimina = document.getElementById(elimina);
+            var segui = document.getElementById(preferiti);
 
             this.appContainer.innerHTML = createCommentoTable();
             const commentoTabella = document.querySelector('#commento');
@@ -439,6 +484,9 @@ class App {
         if (form.checkValidity()) {
             try {
                 const user = await Api.doLogin(form.email.value, form.password.value);
+                this.logoutLink.classList.remove('invisible');
+                this.loginLink.classList.add('invisible');
+                this.signupLink.classList.add('invisible');
                 localStorage.setItem('user', user);
                 page.redirect('/');
             } catch (error) {
@@ -467,7 +515,7 @@ class App {
 
         if (form.checkValidity()) {
             try {
-                await Api.doSignup(form.nome.value, form.email.value, form.password.value);
+                await Api.doSignup(form.nome.value, form.email.value, form.password.value, form.creatore.checked);
                 page.redirect('/login');
             } catch (error) {
                 console.log(error);
@@ -486,12 +534,13 @@ class App {
 
     /**
      * Render the navbar and show the logout link
-     */
+     *
     renderNavBar = (active) => {
         this.navLinks.innerHTML = '';
         this.navLinks.insertAdjacentHTML('beforeend', createNavLinks(active));
         this.logoutLink.classList.remove('invisible');
     };
+*/
 
     /**
      * Perform the logout

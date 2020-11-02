@@ -5,13 +5,24 @@ class PodcastManager {
     constructor() {
         this.podcasts = [];
         this.seguiti = [];
-        this.preferiti = [];
-        this.acquistati = [];
+        
     }
 
     //prendi tutti i podcasts
     async getAllPodcasts() {
         let response = await fetch('/api/podcasts');
+        const podcastsJson = await response.json();
+        if (response.ok) {
+            this.podcasts = podcastsJson.map((ex) => Podcast.form(ex));
+            return this.podcasts;
+        } else {
+            throw podcastsJson;
+        }
+    }
+
+    //prendi tutti i podcasts
+    async getPodcastId(podcastId) {
+        let response = await fetch(`/api/podcasts/${podcastId}`);
         const podcastsJson = await response.json();
         if (response.ok) {
             this.podcasts = podcastsJson.map((ex) => Podcast.form(ex));
@@ -207,8 +218,8 @@ class PodcastManager {
         }
     }
 
-    async deleteSeguiti(podcastId) {
-        let response = await fetch(`/api/seguiti/${podcastId}`, {
+    async deleteSeguiti(podcastId, userId) {
+        let response = await fetch(`/api/seguiti/${podcastId}/${userId}`, {
             method: 'DELETE',
         });
         if (response.ok) {
@@ -229,7 +240,7 @@ class PodcastManager {
     }
 
     async deletePreferiti(podcastId) {
-        let response = await fetch(`/api/preferiti/${podcastId}`, {
+        let response = await fetch(`/api/preferiti/${podcastId}/${userId}`, {
             method: 'DELETE',
         });
         if (response.ok) {
@@ -249,26 +260,6 @@ class PodcastManager {
         }
     }
 
-    async deleteAcquistati(podcastId) {
-        let response = await fetch(`/api/acquistati/${podcastId}`, {
-            method: 'DELETE',
-        });
-        if (response.ok) {
-            return;
-        } else {
-            try {
-                const errDetail = await response.json();
-                throw errDetail.errors;
-            } catch (err) {
-                if (Array.isArray(err)) {
-                    let errors = '';
-                    err.forEach((e, i) => errors += `${i}. ${e.msg} for '${e.param}', `);
-                    throw `Error: ${errors}`;
-                } else
-                    throw 'Error: cannot parse server response';
-            }
-        }
-    }
 }
 
 export default PodcastManager;

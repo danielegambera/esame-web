@@ -8,7 +8,7 @@ exports.createUser = function(user) {
     const sql = 'INSERT INTO user(email, password, nome, creatore) VALUES (?, ?, ?, ?)';
     // create the hash as an async call, given that the operation may be CPU-intensive (and we don't want to block the server)
     bcrypt.hash(user.password, 10).then((hash => {
-      db.run(sql, [user.email, hash], function(err) {
+      db.run(sql, [user.email, hash, user.nome, user.creatore], function(err) {
         if (err) {
           reject(err);
         } else {

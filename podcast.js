@@ -1,6 +1,6 @@
 class Podcast{
 
-    constructor(id, titolo, descrizione, categoria, immagine, data, userId) {
+    constructor(id, titolo, descrizione, categoria, immagine, userId) {
         if(id)
             this.id = id;
 
@@ -8,7 +8,6 @@ class Podcast{
         this.descrizione = descrizione;
         this.categoria = categoria;
         this.immagine = immagine;
-        this.data = data;
         this.userId = userId;
     }
 }

@@ -26,7 +26,7 @@ class Api {
     }
 
     //fa il signup
-    static doSignup = async (nome, email, password) => {
+    static doSignup = async (nome, email, password, creatore) => {
         let response = await fetch('/api/users', {
             method: 'POST',
             headers: {
@@ -35,7 +35,8 @@ class Api {
             body: JSON.stringify({
                 nome,
                 email,
-                password
+                password,
+                creatore
             }),
         });
         if (response.ok) {

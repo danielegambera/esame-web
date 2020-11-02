@@ -8,13 +8,49 @@ const db = require('./db');
 const moment = require('moment');
 
 const createEpisodio = function (dbEpisodio) {
-    return new Episodio(dbEpisodio.id, dbEpisodio.titolo, dbEpisodio.descrizione, dbEpisodio.audio, dbEpisodio.sponsor, dbEpisodio.prezzo, dbEpisodio.data ,dbEpisodio['user_id']);
+    return new Episodio(dbEpisodio.id, dbEpisodio.titolo, dbEpisodio.descrizione, dbEpisodio.audio, dbEpisodio.sponsor, dbEpisodio.prezzo, moment.utc(dbEpisodio.data), dbEpisodio['user_id']);
 }
 
 exports.getEpisodio = function (id, userId) {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM episodi WHERE id = ? AND user_id = ?';
         db.get(sql, [id, userId], (err, row) => {
+            if (err)
+                reject(err);
+            else if (row === undefined)
+                resolve({
+                    error: 'Episodio not found.'
+                });
+            else {
+                const episodio = createEpisodio(row);
+                resolve(episodio);
+            }
+        });
+    });
+}
+
+exports.getPreferiti = function (userId) {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT episodi.name, episodi.id FROM episodi INNER JOIN preferiti ON preferiti.episodio_id, preferiti.user_id=?';
+        db.get(sql, [userId], (err, row) => {
+            if (err)
+                reject(err);
+            else if (row === undefined)
+                resolve({
+                    error: 'Episodio not found.'
+                });
+            else {
+                const episodio = createEpisodio(row);
+                resolve(episodio);
+            }
+        });
+    });
+}
+
+exports.getAcquistati = function () {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT episodi.name, episodi.id FROM acquistati INNER JOIN acquistati ON acquistati.episodio_id, acquistati.user_id=?';
+        db.get(sql, (err, row) => {
             if (err)
                 reject(err);
             else if (row === undefined)

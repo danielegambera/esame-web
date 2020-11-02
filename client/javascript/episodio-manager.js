@@ -5,11 +5,25 @@ import Episodio from "./episodio.js";
 class EpisodioManager {
     constructor() {
         this.episodi = [];
+        this.preferiti = [];
+        this.acquistati = [];
     }
 
     //prendi tutti i episodi
     async getAllEpisodi() {
         let response = await fetch('/api/episodi');
+        const episodiJson = await response.json();
+        if (response.ok) {
+            this.episodi = episodiJson.map((ex) => Episodio.form(ex));
+            return this.episodi;
+        } else {
+            throw episodiJson;
+        }
+    }
+
+    //prendi tutti i podcasts
+    async getEpisodioId(episodioId) {
+        let response = await fetch(`/api/episodi/${episodioId}`);
         const episodiJson = await response.json();
         if (response.ok) {
             this.episodi = episodiJson.map((ex) => Episodio.form(ex));

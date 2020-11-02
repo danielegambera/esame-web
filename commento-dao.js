@@ -8,7 +8,7 @@ const db = require('./db');
 //const moment = require('moment');
 
 const createCommento = function (dbCommento) {
-    return new Commento(dbCommento.id, dbCommento.titolo, dbCommento.testo, dbCommento.data, dbCommento['user_id']);
+    return new Commento(dbCommento.id, dbCommento.titolo, dbCommento.testo, moment.utc(dbCommento.data), dbCommento['user_id']);
 }
 
 exports.getCommento = function (id, userId) {

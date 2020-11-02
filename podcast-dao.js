@@ -6,6 +6,7 @@ const Podcast = require('./podcast');
 
 const db = require('./db');
 const moment = require('moment');
+const e = require('express');
 
 const createPodcast = function (dbPodcast) {
     return new Podcast(
@@ -14,12 +15,12 @@ const createPodcast = function (dbPodcast) {
         dbPodcast.descrizione, 
         dbPodcast.categoria, 
         dbPodcast.immagine,
-        dbPodcast.data, 
+        moment.utc(dbPodcast.data),
         dbPodcast['user_id']
     );
 }
 
-exports.getAllPodcast = function () {
+exports.getAllPodcast = function() {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM podcasts';
         db.get(sql, (err, row) => {
@@ -37,64 +38,10 @@ exports.getAllPodcast = function () {
     });
 }
 
-exports.getSeguiti = function () {
+exports.getSeguiti = function (userId) {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM podcasts';
-        db.get(sql, (err, row) => {
-            if (err)
-                reject(err);
-            else if (row === undefined)
-                resolve({
-                    error: 'Podcast not found.'
-                });
-            else {
-                const podcast = createPodcast(row);
-                resolve(podcast);
-            }
-        });
-    });
-}
-
-exports.getPreferiti = function () {
-    return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM podcasts';
-        db.get(sql, (err, row) => {
-            if (err)
-                reject(err);
-            else if (row === undefined)
-                resolve({
-                    error: 'Podcast not found.'
-                });
-            else {
-                const podcast = createPodcast(row);
-                resolve(podcast);
-            }
-        });
-    });
-}
-
-exports.getAcquistati = function () {
-    return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM podcasts';
-        db.get(sql, (err, row) => {
-            if (err)
-                reject(err);
-            else if (row === undefined)
-                resolve({
-                    error: 'Podcast not found.'
-                });
-            else {
-                const podcast = createPodcast(row);
-                resolve(podcast);
-            }
-        });
-    });
-}
-
-exports.getPersonali = function () {
-    return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM podcasts';
-        db.get(sql, (err, row) => {
+        const sql = 'SELECT podcasts.name, podcasts.id FROM podcasts INNER JOIN seguiti ON seguiti.podcast_id=podcast.id, seguiti.user_id=?';
+        db.get(sql, [userId], (err, row) => {
             if (err)
                 reject(err);
             else if (row === undefined)
@@ -129,8 +76,8 @@ exports.getPodcast = function (id, userId) {
 
 exports.addPodcast = function (podcast) {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO podcasts(titolo, descrizione, categoria, immagine, data, user_id) VALUES(?,?,?,?,?,?)';
-        db.run(sql, [podcast.titolo, podcast.descrizione, podcast.categoria, podcast.immagine, podcast.data, podcast.userId], function (err) {
+        const sql = 'INSERT INTO podcasts(titolo, descrizione, categoria, immagine, user_id) VALUES(?,?,?,?,?)';
+        db.run(sql, [podcast.titolo, podcast.descrizione, podcast.categoria, podcast.immagine, podcast.userId], function (err) {
             if (err) {
                 reject(err);
             } else {
