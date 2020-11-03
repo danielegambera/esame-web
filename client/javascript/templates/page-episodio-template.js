@@ -25,10 +25,10 @@ function createEpisodioPage(episodio) {
                         </div>
                         <audio controls src="${episodio.audio}" id="audio" invisible></audio>
                         <!--Modifica-->
-                            <button type="button" class="btn btn-outline-dark" href="/episodi/${episodio.id}/edit" invisible src="/svg/delete.svg">
+                            <button type="button" id="modificaEp" class="btn btn-outline-dark" href="/episodi/${episodio.id}/edit" invisible src="/svg/delete.svg">
                             </button>
                             <!--Elimina-->
-                            <button type="button" class="btn btn-outline-dark" href="#" invisible src="/svg/delete.svg"></button>
+                            <button type="button" id"eliminaEp" class="btn btn-outline-dark" href="#" invisible src="/svg/delete.svg"></button>
 
                     </div>`;
 }
@@ -68,9 +68,9 @@ function createCommentoRow(commento) {
         <td>${commento.data.format('DD/MM/YYYY')}</td>
         <td>
             <!--Modifica-->
-                <button type="button" class="btn btn-outline-dark" href="/commenti/${commento.id}/edit" invisible src="/svg/edit.svg"></button>
+                <button type="button" class="btn btn-outline-dark" id="modificaCom" href="/commenti/${commento.id}/edit" invisible src="/svg/edit.svg"></button>
             <!--Elimina-->
-                <button type="button" class="btn btn-outline-dark" id="elimina" href="#" invisible src="/svg/delete.svg"></button>
+                <button type="button" class="btn btn-outline-dark" id="eliminaCom" href="#" invisible src="/svg/delete.svg"></button>
         </td>
     </tr>`;
 }

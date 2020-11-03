@@ -3,7 +3,7 @@ function createPodcastTable() {
     return `
     <p>Podcast</p>
     <!-- Add a new podcast... -->
-    <a type="button" href="/addPodcast" id="add-button" class="btn btn-lg btn-success fixed-right-bottom">&#43;</a>
+    <a type="button" href="/addPodcast" id="add-button" class="btn btn-lg btn-secondary fixed-right-bottom">&#43;</a>
     <table class="table">
         <thead class="thead-light">
             <tr>
@@ -19,7 +19,7 @@ function createPodcastTable() {
 
 function createPodcastRow(podcast) {
     return `<tr>
-        <td><a href="/podcast/${podcast.id}">${podcast.titolo}</a></td>
+        <td><a href="/podcasts/${podcast.id}">${podcast.titolo}</a></td>
         <td>${podcast.categoria}</td>
         <td>${podcast.descrizione}</td>
 

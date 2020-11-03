@@ -13,7 +13,7 @@ function createPodcastPage(podcast) {
                         <button type="button" class="btn btn-warning" id="segui" invisible>Segui</button>
 
                         <!--Modifica-->
-                        <button type="button" class="btn btn-outline-dark" href="/podcasts/${podcast.id}/edit" invisible src="/svg/edit.svg"></button>
+                        <button type="button" class="btn btn-outline-dark" href="/podcasts/${podcast.id}/edit" id="modifica" invisible src="/svg/edit.svg"></button>
                             <!--Elimina-->
                             <button type="button" class="btn btn-outline-dark" id="elimina" href="#" invisible src="/svg/delete.svg"></button>
                         <!--Aggiungi-->

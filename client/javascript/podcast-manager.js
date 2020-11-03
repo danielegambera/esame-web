@@ -5,7 +5,7 @@ class PodcastManager {
     constructor() {
         this.podcasts = [];
         this.seguiti = [];
-        this.podcastId = [];
+        this.podcast = [];
         
     }
 
@@ -26,16 +26,16 @@ class PodcastManager {
         let response = await fetch(`/api/podcasts/${podcastId}`);
         const podcastsJson = await response.json();
         if (response.ok) {
-            this.podcastId = podcastsJson.map((ex) => Podcast.form(ex));
-            return this.podcastId;
+            this.podcast = podcastsJson.map((ex) => Podcast.form(ex));
+            return this.podcast;
         } else {
             throw podcastsJson;
         }
     }
 
     //prendi i seguiti
-    async getAllSeguiti() {
-        let response = await fetch('/api/seguiti');
+    async getAllSeguiti(userId) {
+        let response = await fetch(`/api/seguiti/${userId}`);
         const seguitiJson = await response.json();
         if (response.ok) {
             this.seguiti = seguitiJson.map((ex) => Podcast.form(ex));

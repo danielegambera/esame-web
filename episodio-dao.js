@@ -92,6 +92,32 @@ exports.addEpisodio = function (episodio) {
     });
 }
 
+exports.addPreferiti = function (episodioId, userId) {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO preferiti(episodio_id, user_id) VALUES(?,?)';
+        db.run(sql, [episodioId, userId], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this.lastID);
+            }
+        });
+    });
+}
+
+exports.addAcquistati = function (episodioId, userId) {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO acquistati(episodio_id, user_id) VALUES(?,?)';
+        db.run(sql, [episodioId, userId], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this.lastID);
+            }
+        });
+    });
+}
+
 exports.updateEpisodio = function (id, newEpisodio) {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE episodio SET titolo = ?, descrizione = ?, audio = ?, sponsor = ?, prezzo = ?, WHERE id = ? AND user_id = ?';
@@ -112,6 +138,23 @@ exports.updateEpisodio = function (id, newEpisodio) {
 exports.deleteEpisodio = function (id, userId) {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM episodi WHERE id = ? AND user_id = ?';
+        db.run(sql, [id, userId], function (err) {
+            if (err)
+                reject(err);
+            else if (this.changes === 0)
+                resolve({
+                    error: 'Episodio not found.'
+                });
+            else {
+                resolve();
+            }
+        });
+    });
+}
+
+exports.deletePreferiti = function (id, userId) {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM preferiti WHERE id = ? AND user_id = ?';
         db.run(sql, [id, userId], function (err) {
             if (err)
                 reject(err);

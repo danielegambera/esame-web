@@ -110,7 +110,7 @@ class App {
 
     /**
      * Common functionality for many pages
-     */
+     *
     init = async () => {
         //this.userContainer.innerHTML = createUser();
         //this.appContainer.innerHTML = createPodcastsPage();
@@ -120,7 +120,7 @@ class App {
         await this.episodioManager.getAllEpisodi();
         await this.commentoManager.getAllCommenti();
 
-    }
+    }*/
 
        onAcquistaFormSubmitted = (event) => {
            event.preventDefault();
@@ -129,7 +129,7 @@ class App {
            const numeroCarta = addForm.elements['form-numero'].value;
            const ccv = addForm.elements['form-ccv'].value;
 
-           if (isNaN(numeroCarta) || isNaN(ccv) || check('numeroCarta').isLength({min: 14, max: 15})|| check('ccv').isLength({min: 3, max: 4})) {
+           if (isNaN(numeroCarta) || isNaN(ccv) /*|| !numeroCarta == /^[0-9]{3,4}$/|| check('ccv').isLength({min: 3, max: 4})*/) {
                     document.getElementById('error-messages').innerHTML = createAlert('danger', "Numeri non nel formato corretto");
            } else {
                //the id is empty -> add
@@ -283,8 +283,8 @@ class App {
          this.appContainer.innerHTML = createAcquistaForm();
 
              const addForm = document.getElementById('acquista-form');
-             addForm.elements['form-numero'].value = podcast.id;
-             addForm.elements['form-ccv'].value = podcast.titolo;
+             addForm.elements['form-numero'].value;
+             addForm.elements['form-ccv'].value;
          // set up form callback
          document.getElementById('acquista-form').addEventListener('submit', this.onAcquistaFormSubmitted);
      }
@@ -404,12 +404,12 @@ class App {
     showAcquistati = async () => {
         try {
             const user = localStorage.getItem('user');
-            const podcasts = await this.episodioManager.getAllAcquistati(user.id);
-            this.appContainer.innerHTML = createPodcastTable();
-            const podcastTable = document.querySelector('#podcast-list');
+            const episodi = await this.episodioManager.getAllAcquistati(user.id);
+            this.appContainer.innerHTML = createEpisodioTab();
+            const podcastTable = document.querySelector('#episodio-list');
 
-            for (let podcast of podcasts) {
-                const podcastRow = createPodcastRow(podcast);
+            for (let episodio of episodi) {
+                const podcastRow = createPodcastRiga(episodio);
                 podcastTable.insertAdjacentHTML('beforeend', podcastRow);
             }
         } catch (error) {
@@ -419,19 +419,30 @@ class App {
 
     showPodcastPage = async (id) => {
         try {
-            await this.init();
             const podcast = await this.podcastManager.getPodcastId(id);
             const episodi = await this.episodioManager.getAllEpisodi();
-            //const seguiti = this.podcastManager.getAllSeguiti();
+            const seguiti = await this.podcastManager.getAllSeguiti();
             const user = localStorage.getItem('user');
+            var flag = false;
+
+            for(let seguito of seguiti)
+            {
+                if (user.id == seguito.user_id && id == seguito.podcast_id) 
+                {
+                    flag = true;
+                }
+            }
 
             this.appContainer.innerHTML = createPodcastPage(podcast);
 
             var elimina = document.getElementById(elimina);
             var segui = document.getElementById(segui);
+            var modifica = document.getElementById(modifica);
+
             if(user.id == podcast.user_id)
             {
-                document.getElementById()
+                modifica.remove("invisible");
+                elimina.remove("invisible");
             }
 
             this.appContainer.innerHTML = createEpisodioTable();
@@ -454,38 +465,121 @@ class App {
               // callback to seguire a podcast
               segui.addEventListener('click', () => {
                   //aggiungere un controllo per i seguiti
-                  this.podcastManager.addSegui(podcast.id, user.id)
+                  if(flag == false){
+                      this.podcastManager.addSegui(podcast.id, user.id)
                       .catch((error) => {
                           // add an alert message in DOM
                           document.getElementById('error-messages').innerHTML = createAlert('danger', error);
                       });
+                  }
+                  else
+                  {
+                     this.podcastManager.deleteSeguiti(podcast.id, user.id)
+                         .catch((error) => {
+                             // add an alert message in DOM
+                             document.getElementById('error-messages').innerHTML = createAlert('danger', error);
+                         });
+                  }
               });
 
         } catch (error) {
+            console.log(error);
             page.redirect('/login');
         }
     }
 
     showEpisodioPage = async (id) => {
         try {
-            //come prendo il podcast dato id????
-            const commenti = getAllCommenti();
-            const episodio = getEpisodioId(id);
-            const acquistati = getAllAcquistati();
+            const commenti = await this.commentoManager.getAllCommenti();
+            const episodio = await this.episodioManager.getEpisodioId(id);
+            const acquistati = await this.episodioManager.getAllAcquistati();
+            const preferiti = await this.episodioManager.getAllPreferiti();
             const user = localStorage.getItem('user');
+
+            //flag e controlli per vedere se l'episodio è stato comprato o è un preferito
+             var flagbuy = false;
+             var flagPref = false;
+
+             for (let acquistato of acquistati) {
+                 if (user.id == acquistato.user_id && id == acquistato.podcast_id) {
+                     flagbuy = true;
+                 }
+             }
+
+             for (let preferito of preferiti) {
+                 if (user.id == preferito.user_id && id == preferito.podcast_id) {
+                     flagPref = true;
+                 }
+             }
 
             this.appContainer.innerHTML = createEpisodioPage(episodio);
 
-            var elimina = document.getElementById(elimina);
-            var segui = document.getElementById(preferiti);
+            var modificaEp = document.getElementById(modificaEp);
+            var eliminaEp = document.getElementById(eliminaEp);
+            var modificaCom = document.getElementById(modificaCom);
+            var eliminaCom = document.getElementById(eliminaCom);
+            var costo = document.getElementById(costo);
+            var audio = document.getElementById(audio);
+
+            if (user.id == episodio.user_id) {
+                modificaEp.remove("invisible");
+                eliminaEp.remove("invisible");
+            }
+
+            if (flagbuy || episodio.costo == 0) {
+                audio.remove("invisible");
+                costo.add("invisible");
+            }
 
             this.appContainer.innerHTML = createCommentoTable();
             const commentoTabella = document.querySelector('#commento');
 
             for (let commento of commenti) {
                 const commentoRow = createCommentoRow(commento);
+                if (user.id == commento.user_id) {
+                    modificaCom.remove("invisible");
+                    eliminaCom.remove("invisible");
+                    var idComm = commento.id;
+                }
                 commentoTabella.insertAdjacentHTML('beforeend', commentoRow);
             }
+
+            // callback to delete a podcast
+            eliminaEp.addEventListener('click', () => {
+                this.episodioManager.deleteEpisodo(episodio.id)
+                    .catch((error) => {
+                        // add an alert message in DOM
+                        document.getElementById('error-messages').innerHTML = createAlert('danger', error);
+                    });
+            });
+
+            // callback to delete a podcast
+            eliminaCom.addEventListener('click', () => {
+                this.commentoManager.deleteCommento(commento.id)
+                    .catch((error) => {
+                        // add an alert message in DOM
+                        document.getElementById('error-messages').innerHTML = createAlert('danger', error);
+                    });
+            });
+
+            // callback to seguire a podcast
+            preferiti.addEventListener('click', () => {
+                //aggiungere un controllo per i seguiti
+                if (flagPref == false) {
+                    this.episodioManager.addPreferiti(idComm, user.id)
+                        .catch((error) => {
+                            // add an alert message in DOM
+                            document.getElementById('error-messages').innerHTML = createAlert('danger', error);
+                        });
+                } else {
+                    this.episodioManager.deletePreferiti(idComm, user.id)
+                        .catch((error) => {
+                            // add an alert message in DOM
+                            document.getElementById('error-messages').innerHTML = createAlert('danger', error);
+                        });
+                }
+            });
+
         } catch (error) {
             page.redirect('/login');
         }

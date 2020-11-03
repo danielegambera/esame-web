@@ -158,7 +158,7 @@ app.get('/api/seguiti', isLoggedIn, (req, res) => {
 
 // GET /podcasts/<podcastId>
 app.get('/api/podcasts/:podcastId', (req, res) => {
-    daoPodcast.getPodcast(req.params.podcast.id/*, req.user.id*/)
+    daoPodcast.getPodcast(req.params.podcastId /*, req.user.id*/ )
         .then((podcast) => {
             if(podcast.error){
                 res.status(404).json(podcast);
@@ -233,6 +233,36 @@ app.post('/api/commenti', isLoggedIn, [
     commento.userId = req.user.id;
     daoCommento.addCommento(commento)
         .then((id) => res.status(201).header('Location', `/commenti/${id}`).end())
+        .catch((err) => res.status(503).json({
+            error: err
+        }));
+
+});
+
+// POST /seguiti
+app.post('/api/seguiti', isLoggedIn, (req, res) => {
+    daoPodcast.addSeguiti(req.body, req.user.id)
+        .then((id) => res.status(201).header('Location', `/seguiti/${id}`).end())
+        .catch((err) => res.status(503).json({
+            error: err
+        }));
+
+});
+
+// POST /preferiti
+app.post('/api/preferiti', isLoggedIn, (req, res) => {
+    daoEpisodio.addPreferiti(req.episodio.id, req.user.id)
+        .then((id) => res.status(201).header('Location', `/preferiti/${id}`).end())
+        .catch((err) => res.status(503).json({
+            error: err
+        }));
+
+});
+
+// POST /acquistati
+app.post('/api/acquistati', isLoggedIn, (req, res) => {
+    daoEpisodio.addAcquistati(req.episodio.id, req.user.id)
+        .then((id) => res.status(201).header('Location', `/acquistati/${id}`).end())
         .catch((err) => res.status(503).json({
             error: err
         }));
@@ -359,6 +389,40 @@ app.delete('/api/episodi/:episodiId', isLoggedIn, (req, res) => {
 // DELETE /commenti/<commentoId>
 app.delete('/api/commenti/:commentoId', isLoggedIn, (req, res) => {
     daoCommento.deleteCommento(req.params.commentoId, req.user.id)
+        .then((result) => {
+            if (result)
+                res.status(404).json(result);
+            else
+                res.status(204).end();
+        })
+        .catch((err) => res.status(500).json({
+            errors: [{
+                'param': 'Server',
+                'msg': err
+            }],
+        }));
+});
+
+// DELETE /seguiti/<seguitiId>
+app.delete('/api/seguiti/:seguitiId', isLoggedIn, (req, res) => {
+    daoCommento.deleteCommento(req.params.seguitiId, req.user.id)
+        .then((result) => {
+            if (result)
+                res.status(404).json(result);
+            else
+                res.status(204).end();
+        })
+        .catch((err) => res.status(500).json({
+            errors: [{
+                'param': 'Server',
+                'msg': err
+            }],
+        }));
+});
+
+// DELETE /preferiti/<preferitiId>
+app.delete('/api/preferiti/:preferitiId', isLoggedIn, (req, res) => {
+    daoCommento.deleteCommento(req.params.preferitiId, req.user.id)
         .then((result) => {
             if (result)
                 res.status(404).json(result);

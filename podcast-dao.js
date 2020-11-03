@@ -35,7 +35,7 @@ exports.getAllPodcast = function () {
 
 exports.getSeguiti = function (userId) {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT podcasts.name, podcasts.id FROM podcasts INNER JOIN seguiti ON seguiti.podcast_id=podcast.id, seguiti.user_id=?';
+        const sql = 'SELECT podcasts.name, podcasts.id FROM podcasts INNER JOIN seguiti ON seguiti.podcast_id = podcast.id, seguiti.user_id = ?';
         db.get(sql, [userId], (err, row) => {
             if (err)
                 reject(err);
@@ -57,10 +57,6 @@ exports.getPodcast = function (id/*, userId*/) {
         db.get(sql, [id], (err, row) => {
             if (err)
                 reject(err);
-            else if (row === undefined)
-                resolve({
-                    error: 'Podcast not found.'
-                });
             else {
                 const podcastId = createPodcast(row);
                 resolve(podcastId);
@@ -73,6 +69,19 @@ exports.addPodcast = function (podcast) {
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO podcasts(titolo, descrizione, categoria, immagine, user_id) VALUES(?,?,?,?,?)';
         db.run(sql, [podcast.titolo, podcast.descrizione, podcast.categoria, podcast.immagine, podcast.userId], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this.lastID);
+            }
+        });
+    });
+}
+
+exports.addSeguiti = function (podcastId, userId) {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO seguiti(podcast_id, user_id) VALUES(?,?)';
+        db.run(sql, [podcastId, userId], function (err) {
             if (err) {
                 reject(err);
             } else {
@@ -107,6 +116,23 @@ exports.deletePodcast = function(id, userId) {
                 reject(err);
             else if (this.changes === 0)
                 resolve({error: 'Podcast not found.'});
+            else {
+                resolve();
+            }
+        });
+    });
+}
+
+exports.deleteSeguiti = function (podcastId, userId) {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM seguiti WHERE id = ? AND user_id = ?';
+        db.run(sql, [podcastId, userId], function (err) {
+            if (err)
+                reject(err);
+            else if (this.changes === 0)
+                resolve({
+                    error: 'Podcast not found.'
+                });
             else {
                 resolve();
             }
