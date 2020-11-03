@@ -79,18 +79,20 @@ app.use(passport.session());
 // === REST API endpoints ===/
 
 // GET /podcasts
-app.get('/api/podcasts', (res) => {
+app.get('/api/podcasts', (req, res) => {
     daoPodcast.getAllPodcast()
         .then((podcasts) => res.json(podcasts) )
         .catch((err) => {
-            res.status(500).json({
-                errors: [{'msg': err}],
-             });
+                    res.status(500).json({
+                        errors: [{
+                            'msg': err
+                        }],
+                    });
        });
 });
 
 // GET /episodi
-app.get('/api/episodi', (res) => {
+app.get('/api/episodi', (req, res) => {
     daoEpisodio.getAllEpisodi()
         .then((episodi) => res.json(episodi))
         .catch((err) => {
@@ -103,7 +105,7 @@ app.get('/api/episodi', (res) => {
 });
 
 // GET /commenti
-app.get('/api/commenti', (res) => {
+app.get('/api/commenti', (req, res) => {
     daoCommento.getAllCommenti()
         .then((commenti) => res.json(commenti))
         .catch((err) => {
@@ -156,7 +158,7 @@ app.get('/api/seguiti', isLoggedIn, (req, res) => {
 
 // GET /podcasts/<podcastId>
 app.get('/api/podcasts/:podcastId', (req, res) => {
-    daoPodcast.getPodcast(req.params.podcastId, req.user.id)
+    daoPodcast.getPodcast(req.params.podcast.id/*, req.user.id*/)
         .then((podcast) => {
             if(podcast.error){
                 res.status(404).json(podcast);
@@ -373,9 +375,7 @@ app.delete('/api/commenti/:commentoId', isLoggedIn, (req, res) => {
 
 // POST /users
 // Sign up
-app.post('/api/users', /*[check("nome").notEmpty, check("email").notEmpty, check("password").notEmpty],*/ (req, res) => {
-    // create a user object from the signup form
-    // additional fields may be useful (name, role, etc.)
+app.post('/api/users', (req, res) => {
     const user = {
         nome: req.body.nome,
         email: req.body.email,

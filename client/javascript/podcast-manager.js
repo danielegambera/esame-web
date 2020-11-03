@@ -5,6 +5,7 @@ class PodcastManager {
     constructor() {
         this.podcasts = [];
         this.seguiti = [];
+        this.podcastId = [];
         
     }
 
@@ -25,8 +26,8 @@ class PodcastManager {
         let response = await fetch(`/api/podcasts/${podcastId}`);
         const podcastsJson = await response.json();
         if (response.ok) {
-            this.podcasts = podcastsJson.map((ex) => Podcast.form(ex));
-            return this.podcasts;
+            this.podcastId = podcastsJson.map((ex) => Podcast.form(ex));
+            return this.podcastId;
         } else {
             throw podcastsJson;
         }

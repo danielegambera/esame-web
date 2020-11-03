@@ -15,12 +15,11 @@ const createPodcast = function (dbPodcast) {
         dbPodcast.descrizione, 
         dbPodcast.categoria, 
         dbPodcast.immagine,
-        moment.utc(dbPodcast.data),
         dbPodcast['user_id']
     );
 }
 
-exports.getAllPodcast = function() {
+exports.getAllPodcast = function () {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM podcasts';
         db.all(sql, (err, rows) => {
@@ -52,10 +51,10 @@ exports.getSeguiti = function (userId) {
     });
 }
 
-exports.getPodcast = function (id, userId) {
+exports.getPodcast = function (id/*, userId*/) {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM podcasts WHERE id = ? AND user_id = ?';
-        db.get(sql, [id, userId], (err, row) => {
+        const sql = 'SELECT * FROM podcasts WHERE id = ?';
+        db.get(sql, [id], (err, row) => {
             if (err)
                 reject(err);
             else if (row === undefined)
@@ -63,8 +62,8 @@ exports.getPodcast = function (id, userId) {
                     error: 'Podcast not found.'
                 });
             else {
-                const podcast = createPodcast(row);
-                resolve(podcast);
+                const podcastId = createPodcast(row);
+                resolve(podcastId);
             }
         });
     });

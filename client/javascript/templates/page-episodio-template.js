@@ -60,7 +60,7 @@ function createCommentoTable() {
     </table>`;
 }
 
-function createommentoRow(commento) {
+function createCommentoRow(commento) {
     return `<tr>
         <td>${commento.titolo}</td>
         <td>${commento.testo}</td>
@@ -75,4 +75,4 @@ function createommentoRow(commento) {
     </tr>`;
 }
 
-export { createEpisodioPage , createCommentoTable, createommentoRow};
+export { createEpisodioPage , createCommentoTable, createCommentoRow};

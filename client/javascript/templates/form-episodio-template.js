@@ -35,6 +35,13 @@ function createEpisodioForm() {
       </div>
 
       <div class="form-group">
+        <label class="control-label">Data</label>
+        <div>
+            <input type="date" class="form-control input-lg" name="Data" id="form-date">
+        </div>
+      </div>
+
+      <div class="form-group">
         <div>
             <button type="submit" class="btn btn-primary">Salva</button>
         </div>

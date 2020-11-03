@@ -4,17 +4,20 @@ import CommentoManager from './commento-manager.js';
 import createPodcastAddForm from './templates/form-podcast-template.js';
 import createEpisodioAddForm from './templates/form-episodio-template.js';
 import createCommentoAddForm from './templates/form-commento-template.js';
+import createAcquistaForm from './templates/form-acquista-template.js';
 import Podcast from './podcast.js';
 import Episodio from './episodio.js';
 import Commento from './commento.js';
 import Api from './api.js';
-import { createEpisodioRow, createEpisodioTable, createPodcastPage } from './templates/page-podcast-template.js';
+import { createPodcastPage, createEpisodioTable, createEpisodioRow} from './templates/page-podcast-template.js';
+import { createEpisodioPage, createCommentoTable, createCommentoRow} from "./templates/page-episodio-template.js"
 import { createPodcastTable, createPodcastRow} from './templates/page-tabella-podcast-template.js';
+import { createEpisodioTab, createEpisodioRiga} from './templates/page-tabella-episodio-template.js';
 import createLoginForm from './templates/login-template.js';
 import createSignupForm from './templates/signup-template.js';
 import createAlert from './templates/alert-template.js';
 import page from '//unpkg.com/page/page.mjs';
-import createAcquistaForm from './templates/form-acquista-template.js';
+
 
 
 
@@ -343,29 +346,14 @@ class App {
     showPodcasts = async () => {
         try {
             const podcasts = await this.podcastManager.getAllPodcasts();
-
-            const user = localStorage.getItem('user');
-
-            if (user !== null) {
-                // welcome the user
-                document.getElementById('error-messages').innerHTML = createAlert('success', `Welcome ${user}!`);
-                // automatically remove the flash message after 3 sec
-                setTimeout(() => {
-                    document.getElementById('error-messages').innerHTML = '';
-                }, 3000);
-                localStorage.clear();
-            }
-
-            //this.renderNavBar('tutti');
-
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
-
             for (let podcast of podcasts) {
                 const podcastRow = createPodcastRow(podcast);
                 podcastTable.insertAdjacentHTML('beforeend', podcastRow);
             }
         } catch (error) {
+            console.log(error);
             page.redirect('/login');
         }
     }
@@ -375,11 +363,9 @@ class App {
      */
     showSeguiti = async () => {
         try {
-            const podcasts = await this.podcastManager.getAllSeguiti();
-            //const user = localStorage.getItem('user');
 
-            //this.renderNavBar('seguiti');
-
+            const user = localStorage.getItem('user');
+            const podcasts = await this.podcastManager.getAllSeguiti(user.id);
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
 
@@ -388,6 +374,7 @@ class App {
                 podcastTable.insertAdjacentHTML('beforeend', podcastRow);
             }
         } catch (error) {
+            console.log(error);
             page.redirect('/login');
         }
     }
@@ -397,10 +384,8 @@ class App {
      */
     showPreferiti = async () => {
         try {
-            const podcasts = await this.episodioManager.getAllPreferiti();
-
-            //this.renderNavBar('preferiti');
-
+            const user = localStorage.getItem('user');            
+            const podcasts = await this.episodioManager.getAllPreferiti(user.id);
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
 
@@ -418,10 +403,8 @@ class App {
      */
     showAcquistati = async () => {
         try {
-            const podcasts = await this.episodioManager.getAllAcquistati();
-
-            //this.renderNavBar('acquistati');
-
+            const user = localStorage.getItem('user');
+            const podcasts = await this.episodioManager.getAllAcquistati(user.id);
             this.appContainer.innerHTML = createPodcastTable();
             const podcastTable = document.querySelector('#podcast-list');
 
@@ -436,16 +419,20 @@ class App {
 
     showPodcastPage = async (id) => {
         try {
-            //come prendo il podcast dato id????
-            const podcast = getPodcastId(id);
-            const episodi = getAllEpisodi();
-            //const seguiti = getAllSeguiti();
+            await this.init();
+            const podcast = await this.podcastManager.getPodcastId(id);
+            const episodi = await this.episodioManager.getAllEpisodi();
+            //const seguiti = this.podcastManager.getAllSeguiti();
             const user = localStorage.getItem('user');
 
             this.appContainer.innerHTML = createPodcastPage(podcast);
 
             var elimina = document.getElementById(elimina);
             var segui = document.getElementById(segui);
+            if(user.id == podcast.user_id)
+            {
+                document.getElementById()
+            }
 
             this.appContainer.innerHTML = createEpisodioTable();
             const episodioTabella = document.querySelector('#episodio');
@@ -580,7 +567,7 @@ class App {
     logout = async () => {
         await Api.doLogout();
         this.logoutLink.classList.add('invisible');
-        page.redirect('/');
+        page.redirect('/podcast');
     }
 
 }

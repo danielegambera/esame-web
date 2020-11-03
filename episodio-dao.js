@@ -61,10 +61,10 @@ exports.getPreferiti = function (userId) {
     });
 }
 
-exports.getAcquistati = function () {
+exports.getAcquistati = function (userId) {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT episodi.name, episodi.id FROM acquistati INNER JOIN acquistati ON acquistati.episodio_id, acquistati.user_id=?';
-        db.get(sql, (err, row) => {
+        db.get(sql, [userId], (err, row) => {
             if (err)
                 reject(err);
             else if (row === undefined)

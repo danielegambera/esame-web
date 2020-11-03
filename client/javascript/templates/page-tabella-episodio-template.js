@@ -1,5 +1,5 @@
 
-function createEpisodioTable() {
+function createEpisodioTab() {
     return `
     <p>Episodi</p>
     <table class="table">
@@ -13,13 +13,10 @@ function createEpisodioTable() {
     </table>`;
 }
 
-function createEpisodioRow(episodio) {
+function createEpisodioRiga(episodio) {
     return `<tr>
         <td><a href="/podcast/${episodio.id}">${episodio.titolo}</a></td>
     </tr>`;
 }
 
-export {
-    createEpisodioRow,
-    createEpisodioTable
-};
+export {createEpisodioTab, createEpisodioRiga};

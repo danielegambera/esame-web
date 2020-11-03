@@ -182,7 +182,7 @@ class EpisodioManager {
         }
     }
 
-    async deletePreferiti(podcastId) {
+    async deletePreferiti(podcastId, userId) {
         let response = await fetch(`/api/preferiti/${podcastId}/${userId}`, {
             method: 'DELETE',
         });

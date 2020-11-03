@@ -3,9 +3,10 @@
 
 class Commento{
 
-    constructor(id=undefined, titolo, descrizione){
+    constructor(id=undefined, titolo, data, descrizione){
         this.id = id;
-        data = moment().format("DD/MM/YYYY");
+        //data = new Date();
+        this.data = moment.utc(data);
         this.descrizione = descrizione;
         this.titolo = titolo;
 
@@ -18,6 +19,7 @@ class Commento{
      */
     static form(json){
         const t = Object.assign(new Commento(), json);
+        t.data = moment.utc(t.data);
         return t;
     }
 }

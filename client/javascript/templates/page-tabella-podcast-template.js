@@ -8,6 +8,8 @@ function createPodcastTable() {
         <thead class="thead-light">
             <tr>
                 <th>Titolo</th>
+                <th>Categoria</th>
+                <th>Descrizione</th>
             </tr>
         </thead>
         <tbody id="podcast-list">
@@ -18,6 +20,10 @@ function createPodcastTable() {
 function createPodcastRow(podcast) {
     return `<tr>
         <td><a href="/podcast/${podcast.id}">${podcast.titolo}</a></td>
+        <td>${podcast.categoria}</td>
+        <td>${podcast.descrizione}</td>
+
+
     </tr>`;
 }
 
