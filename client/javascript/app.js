@@ -423,7 +423,7 @@ class App {
             const episodi = await this.episodioManager.getAllEpisodi();
             const seguiti = await this.podcastManager.getAllSeguiti();
             const user = localStorage.getItem('user');
-            var flag = false;
+            let flag = false;
 
             for(let seguito of seguiti)
             {
